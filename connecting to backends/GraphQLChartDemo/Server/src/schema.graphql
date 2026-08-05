@@ -1,0 +1,21 @@
+type MonthlySales {
+  id: Int!
+  month: String!
+  sales: Float!
+  expenses: Float!
+}
+
+type MonthlySalesReturnType {
+  result: [MonthlySales!]!
+  count: Int!
+}
+
+input DataManagerInput {
+  skip: Int
+  take: Int
+  requiresCounts: Boolean
+}
+
+type Query {
+  getMonthlySales(datamanager: DataManagerInput): MonthlySalesReturnType!
+}

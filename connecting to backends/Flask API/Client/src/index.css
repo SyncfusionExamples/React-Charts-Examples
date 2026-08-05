@@ -1,0 +1,40 @@
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f5f7fb;
+}
+
+.app-container {
+  padding: 30px;
+}
+
+.card {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+.description {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+.status {
+  text-align: center;
+  font-size: 16px;
+  padding: 20px;
+}
+
+.error {
+  color: #dc2626;
+}

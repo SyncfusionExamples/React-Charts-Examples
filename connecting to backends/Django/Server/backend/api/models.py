@@ -1,0 +1,8 @@
+from django.db import models
+
+class Sales(models.Model):
+    month = models.CharField(max_length=20)
+    revenue = models.IntegerField()
+
+    def __str__(self):
+        return self.month

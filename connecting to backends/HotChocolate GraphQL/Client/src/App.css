@@ -1,0 +1,36 @@
+.app-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 24px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+.header p {
+  color: #6b7280;
+}
+
+.chart-card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.status {
+  text-align: center;
+  padding: 24px;
+  font-size: 18px;
+}
+
+.error {
+  color: #dc2626;
+}

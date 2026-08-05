@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "dgSpecHash": "s2yfM3fzHIg=",
+  "success": true,
+  "projectFilePath": "D:\\Source\\May 2026\\MySQL Server\\ChartMySQL.Server\\ChartMySQL.Server.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\MukilanSethuraman\\.nuget\\packages\\linq2db\\6.1.0\\linq2db.6.1.0.nupkg.sha512",
+    "C:\\Users\\MukilanSethuraman\\.nuget\\packages\\linq2db.aspnet\\5.4.1.9\\linq2db.aspnet.5.4.1.9.nupkg.sha512",
+    "C:\\Users\\MukilanSethuraman\\.nuget\\packages\\linq2db.mysql\\6.1.0\\linq2db.mysql.6.1.0.nupkg.sha512",
+    "C:\\Users\\MukilanSethuraman\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.16\\microsoft.aspnetcore.openapi.9.0.16.nupkg.sha512",
+    "C:\\Users\\MukilanSethuraman\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\9.0.10\\microsoft.extensions.dependencyinjection.9.0.10.nupkg.sha512",
+    "C:\\Users\\MukilanSethuraman\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\9.0.10\\microsoft.extensions.dependencyinjection.abstractions.9.0.10.nupkg.sha512",
+    "C:\\Users\\MukilanSethuraman\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\9.0.10\\microsoft.extensions.logging.abstractions.9.0.10.nupkg.sha512",
+    "C:\\Users\\MukilanSethuraman\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512",
+    "C:\\Users\\MukilanSethuraman\\.nuget\\packages\\mysqlconnector\\2.5.0\\mysqlconnector.2.5.0.nupkg.sha512"
+  ],
+  "logs": []
+}

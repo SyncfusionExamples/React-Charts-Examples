@@ -1,0 +1,19 @@
+
+{
+  "name": "chart-graphql-server",
+  "version": "1.0.0",
+  "description": "Apollo GraphQL backend for Syncfusion React Chart",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/server": "^5.5.1",
+    "graphql": "^16.14.1"
+  }
+}

@@ -1,0 +1,6 @@
+@ChartSQLiteAPI_HostAddress = http://localhost:5165
+
+GET {{ChartSQLiteAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

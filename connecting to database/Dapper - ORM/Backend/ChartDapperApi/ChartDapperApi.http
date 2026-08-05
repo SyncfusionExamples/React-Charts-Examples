@@ -1,0 +1,6 @@
+@ChartDapperApi_HostAddress = http://localhost:5137
+
+GET {{ChartDapperApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

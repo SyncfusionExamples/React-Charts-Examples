@@ -1,0 +1,12 @@
+@import '../node_modules/@syncfusion/ej2-base/styles/bootstrap5.css';
+@import '../node_modules/@syncfusion/ej2-buttons/styles/bootstrap5.css';
+@import '../node_modules/@syncfusion/ej2-popups/styles/bootstrap5.css';
+
+.App {
+  text-align: center;
+}
+
+.chart-container {
+  width: 900px;
+  margin: 40px auto;
+}

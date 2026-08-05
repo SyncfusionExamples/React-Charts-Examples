@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "QjjMSvE5KGe0X7Czp1nFy7qU/zF1pw68RUa0NnVksMM=",
+  "Source": "ChartMySQL.Server",
+  "BasePath": "_content/ChartMySQL.Server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
