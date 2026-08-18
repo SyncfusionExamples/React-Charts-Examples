@@ -1,44 +1,16 @@
-# React Chart with Remote Save Concept
+# React + Vite
 
-## Prerequisites
-- Node.js (LTS)
-- npm
-- Visual Studio Code
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Project Structure
-- /
-  - package.json
-  - public/
-  - src/
-    - App.js
-    - App.css
-    - index.js
+Currently, two official plugins are available:
 
-## Install Dependencies
-Run in project root:
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-npm install
+## React Compiler
 
-## Run Client Application
-Run in project root:
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-npm start
+## Expanding the ESLint configuration
 
-Then open the local development URL shown in the terminal.
-
-## Build for Production
-Run in project root:
-
-npm run build
-
-## (Optional) Run Backend Server
-1. Navigate to backend project directory
-2. Restore dependencies
-3. Run server
-4. Ensure API URL matches client configuration
-
-## Summary
-- Install dependencies
-- Start development server
-- Access app in browser
-- Build project for production when needed
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

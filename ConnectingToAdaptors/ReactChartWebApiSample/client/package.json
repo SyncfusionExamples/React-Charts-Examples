@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@syncfusion/ej2-data": "^33.2.12",
-    "@syncfusion/ej2-react-charts": "^33.2.13",
+    "@syncfusion/ej2-react-charts": "^33.2.15",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },

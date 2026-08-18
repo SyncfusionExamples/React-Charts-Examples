@@ -12,6 +12,6 @@ class SalesViewSet(ModelViewSet):
         year = self.request.query_params.get('year')
 
         if year:
-            queryset = queryset.filter(month__icontains=year)
+            queryset = queryset.filter(year=year)
 
         return queryset
