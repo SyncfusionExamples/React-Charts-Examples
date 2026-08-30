@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   ChartComponent,
   SeriesCollectionDirective,
@@ -9,82 +9,40 @@ import {
   ColumnSeries,
   Category,
   Tooltip,
-  Legend,
-  DataLabel
+  Legend
 } from '@syncfusion/ej2-react-charts';
 
-type SalesRecord = {
-  month: string;
-  sales: number;
-};
+let chartInstance: ChartComponent | null = null;
 
-type SalesApiResponse = {
-  result: SalesRecord[];
-  count: number;
-};
+export default function ChartPage() {
 
-export default function SalesChart() {
-  const [chartData, setChartData] = useState<SalesRecord[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const loadData = async () => {
+    const response = await fetch('/api/sales');
+    const data = await response.json();
+
+    if (chartInstance) {
+      chartInstance.series[0].dataSource = data.result;
+      chartInstance.refresh();
+    }
+  };
 
   useEffect(() => {
-    async function loadSalesData() {
-      try {
-        const response = await fetch('/api/sales');
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch sales data from /api/sales');
-        }
-
-        const data: SalesApiResponse = await response.json();
-
-        if (!data.result || !Array.isArray(data.result)) {
-          throw new Error('Invalid API response. Expected result array.');
-        }
-
-        setChartData(data.result);
-      } catch (error) {
-        console.error('Chart data loading error:', error);
-        setErrorMessage('Unable to load chart data. Please check /api/sales API route.');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadSalesData();
+    loadData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="chart-wrapper">
-        <p className="loading-text">Loading chart data...</p>
-      </div>
-    );
-  }
-
-  if (errorMessage) {
-    return (
-      <div className="chart-wrapper">
-        <p className="error-text">{errorMessage}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="chart-wrapper">
+    <div style={{ padding: '20px' }}>
+      <h1>Monthly Sales Chart</h1>
+
       <ChartComponent
         id="sales-chart"
         title="Monthly Sales Report"
-        width="100%"
-        height="450px"
         primaryXAxis={{
           valueType: 'Category',
           title: 'Month'
         }}
         primaryYAxis={{
-          title: 'Sales',
-          labelFormat: '{value}'
+          title: 'Sales'
         }}
         tooltip={{
           enable: true
@@ -92,29 +50,26 @@ export default function SalesChart() {
         legendSettings={{
           visible: true
         }}
+        ref={(chart) => {
+          chartInstance = chart;
+        }}
       >
         <Inject
           services={[
             ColumnSeries,
             Category,
             Tooltip,
-            Legend,
-            DataLabel
+            Legend
           ]}
         />
 
         <SeriesCollectionDirective>
           <SeriesDirective
-            dataSource={chartData}
+            dataSource={[]}
+            type="Column"
             xName="month"
             yName="sales"
             name="Sales"
-            type="Column"
-            marker={{
-              dataLabel: {
-                visible: true
-              }
-            }}
           />
         </SeriesCollectionDirective>
       </ChartComponent>

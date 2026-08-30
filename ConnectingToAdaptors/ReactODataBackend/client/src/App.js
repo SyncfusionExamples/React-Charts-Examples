@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { DataManager, ODataV4Adaptor, Query } from '@syncfusion/ej2-data';
 import {
   ChartComponent,
@@ -11,49 +11,53 @@ import {
   Legend
 } from '@syncfusion/ej2-react-charts';
 
-
 function App() {
-
-  const [data, setData] = useState([]);
-
-  // ✅ Configure OData adaptor
-  const dataManager = new DataManager({
+  // ✅ Configure the OData V4 adaptor as the data source.
+  // The Chart component accepts a DataManager instance directly and will
+  // internally issue the OData request when it renders, exactly like the
+  // Grid's ODataV4Adaptor pattern.
+  const chartData = new DataManager({
     url: 'http://localhost:5232/odata/Orders',
     adaptor: new ODataV4Adaptor(),
     crossDomain: true
   });
 
-  // ✅ Fetch data
-  useEffect(() => {
-    const query = new Query().take(10); // limit records
+  // ✅ Optional server-side query: take the first 10 records sorted by OrderID.
+  const chartQuery = new Query().take(10).sortBy('OrderID');
 
-    dataManager.executeQuery(query).then((e) => {
-      setData(e.result);
-    });
-  }, []);
+  const primaryXAxis = {
+    valueType: 'Category',
+    title: 'Customer'
+  };
+
+  const primaryYAxis = {
+    title: 'Amount'
+  };
 
   return (
-    <div style={{ margin: "40px" }}>
+    <div style={{ margin: '40px' }}>
       <h2>📊 Syncfusion React Chart with ODataV4Adaptor</h2>
 
       <ChartComponent
-        primaryXAxis={{ valueType: 'Category', title: 'Customer' }}
-        primaryYAxis={{ title: 'Amount' }}
+        id="orders-chart"
+        primaryXAxis={primaryXAxis}
+        primaryYAxis={primaryYAxis}
         title="Order Amount by Customer"
+        tooltip={{ enable: true }}
+        legendSettings={{ visible: true }}
       >
         <Inject services={[ColumnSeries, Category, Tooltip, Legend]} />
 
         <SeriesCollectionDirective>
           <SeriesDirective
-            dataSource={data}
+            dataSource={chartData}
+            query={chartQuery}
             xName="CustomerID"
             yName="Amount"
             type="Column"
             name="Orders"
-            tooltipMappingName="Amount"
           />
         </SeriesCollectionDirective>
-
       </ChartComponent>
     </div>
   );

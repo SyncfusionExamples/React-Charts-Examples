@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 import {
   ChartComponent,
@@ -8,184 +8,145 @@ import {
   ColumnSeries,
   LineSeries,
   Category,
-  Legend,
   Tooltip,
+  Legend,
   DataLabel
 } from "@syncfusion/ej2-react-charts";
 
-const GRAPHQL_API_URL = "http://localhost:4000/";
+import {
+  DataManager,
+  Query,
+  GraphQLAdaptor
+} from "@syncfusion/ej2-data";
 
-function App() {
-  const [chartData, setChartData] = useState([]);
-  const [recordCount, setRecordCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
+const ChartGraphQL = () => {
+
+  const chartRef = useRef(null);
 
   useEffect(() => {
-    fetchChartData();
-  }, []);
 
-  const fetchChartData = async () => {
-    try {
-      setLoading(true);
-      setErrorMessage("");
+    const dataManager = new DataManager({
+      url: "http://localhost:4000/",
 
-      const query = `
-        query GetSalesChartData {
-          getSalesChartData {
-            result {
-              month
-              sales
-              expenses
-              profit
-            }
-            count
-          }
-        }
-      `;
-
-      const response = await fetch(GRAPHQL_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      adaptor: new GraphQLAdaptor({
+        response: {
+          result: "getSalesChartData.result",
+          count: "getSalesChartData.count"
         },
-        body: JSON.stringify({
-          query: query
-        })
+
+        query: `
+          query {
+            getSalesChartData {
+              count
+              result {
+                month
+                sales
+                expenses
+                profit
+              }
+            }
+          }
+        `
+      })
+    });
+
+    dataManager
+      .executeQuery(new Query())
+      .then((e) => {
+
+        console.log(e);
+
+        const chartData =
+          Array.isArray(e.result)
+            ? e.result
+            : e.result?.result || [];
+
+        if (
+          chartRef.current &&
+          chartRef.current.series &&
+          chartRef.current.series.length > 0
+        ) {
+
+          chartRef.current.series[0].dataSource =
+            chartData;
+
+          chartRef.current.series[1].dataSource =
+            chartData;
+
+          chartRef.current.series[2].dataSource =
+            chartData;
+
+          chartRef.current.refresh();
+        }
+
+      })
+      .catch((error) => {
+        console.error(error);
       });
 
-      const responseJson = await response.json();
-
-      if (responseJson.errors) {
-        throw new Error(responseJson.errors[0].message);
-      }
-
-      const result = responseJson.data.getSalesChartData.result;
-      const count = responseJson.data.getSalesChartData.count;
-
-      setChartData(result);
-      setRecordCount(count);
-    } catch (error) {
-      setErrorMessage(error.message || "Something went wrong while loading chart data.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const primaryXAxis = {
-    valueType: "Category",
-    title: "Month"
-  };
-
-  const primaryYAxis = {
-    title: "Amount",
-    labelFormat: "{value}K"
-  };
-
-  const tooltip = {
-    enable: true
-  };
-
-  const legendSettings = {
-    visible: true
-  };
-
-  const marker = {
-    dataLabel: {
-      visible: true
-    }
-  };
+  }, []);
 
   return (
-    <div className="app-container">
-      <div className="card">
-        <div className="header">
-          <h1>Syncfusion React Chart with Apollo GraphQL</h1>
-          <p>
-            This chart loads simple sales data from a GraphQL backend created using Apollo Server.
-          </p>
-        </div>
+    <ChartComponent
+      id="graphql-chart"
+      ref={chartRef}
+      title="Monthly Sales Analysis"
+      primaryXAxis={{
+        valueType: "Category",
+        title: "Month"
+      }}
+      primaryYAxis={{
+        title: "Amount"
+      }}
+      tooltip={{
+        enable: true
+      }}
+      legendSettings={{
+        visible: true
+      }}
+      height="500px"
+    >
+      <Inject
+        services={[
+          ColumnSeries,
+          LineSeries,
+          Category,
+          Legend,
+          Tooltip,
+          DataLabel
+        ]}
+      />
 
-        {loading && (
-          <div className="status loading">
-            Loading chart data from GraphQL server...
-          </div>
-        )}
+      <SeriesCollectionDirective>
 
-        {errorMessage && (
-          <div className="status error">
-            Error: {errorMessage}
-            <br />
-            Please check whether your GraphQL backend is running at http://localhost:4000/
-          </div>
-        )}
+        <SeriesDirective
+          dataSource={[]}
+          xName="month"
+          yName="sales"
+          type="Column"
+          name="Sales"
+        />
 
-        {!loading && !errorMessage && (
-          <div className="status success">
-            Successfully loaded {recordCount} records from GraphQL backend.
-          </div>
-        )}
+        <SeriesDirective
+          dataSource={[]}
+          xName="month"
+          yName="expenses"
+          type="Column"
+          name="Expenses"
+        />
 
-        {!loading && !errorMessage && (
-          <ChartComponent
-            id="sales-chart"
-            title="Monthly Sales, Expenses and Profit"
-            primaryXAxis={primaryXAxis}
-            primaryYAxis={primaryYAxis}
-            tooltip={tooltip}
-            legendSettings={legendSettings}
-          >
-            <Inject
-              services={[
-                ColumnSeries,
-                LineSeries,
-                Category,
-                Legend,
-                Tooltip,
-                DataLabel
-              ]}
-            />
+        <SeriesDirective
+          dataSource={[]}
+          xName="month"
+          yName="profit"
+          type="Line"
+          name="Profit"
+        />
 
-            <SeriesCollectionDirective>
-              <SeriesDirective
-                dataSource={chartData}
-                xName="month"
-                yName="sales"
-                name="Sales"
-                type="Column"
-                marker={marker}
-              />
+      </SeriesCollectionDirective>
 
-              <SeriesDirective
-                dataSource={chartData}
-                xName="month"
-                yName="expenses"
-                name="Expenses"
-                type="Column"
-                marker={marker}
-              />
-
-              <SeriesDirective
-                dataSource={chartData}
-                xName="month"
-                yName="profit"
-                name="Profit"
-                type="Line"
-                marker={{
-                  visible: true,
-                  width: 8,
-                  height: 8,
-                  dataLabel: {
-                    visible: true
-                  }
-                }}
-              />
-            </SeriesCollectionDirective>
-          </ChartComponent>
-        )}
-      </div>
-    </div>
+    </ChartComponent>
   );
-}
+};
 
-export default App;
+export default ChartGraphQL;

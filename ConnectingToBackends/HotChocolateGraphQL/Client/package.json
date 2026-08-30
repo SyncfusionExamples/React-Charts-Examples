@@ -1,4 +1,3 @@
-
 {
   "name": "syncfusion-chart-graphql-hotchocolate",
   "private": true,
@@ -9,9 +8,9 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-
   "dependencies": {
-    "@syncfusion/ej2-react-charts": "^33.2.10",
+    "@syncfusion/ej2-data": "^34.2.2",
+    "@syncfusion/ej2-react-charts": "^33.2.15",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },

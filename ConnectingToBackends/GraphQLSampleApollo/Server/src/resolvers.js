@@ -1,12 +1,10 @@
-import { salesChartData } from "./data.js";
+import { salesChartData } from './data.js';
 
 export const resolvers = {
   Query: {
-    getSalesChartData: () => {
-      return {
-        result: salesChartData,
-        count: salesChartData.length
-      };
-    }
+    getSalesChartData: () => ({
+      result: salesChartData,
+      count: salesChartData.length
+    })
   }
 };

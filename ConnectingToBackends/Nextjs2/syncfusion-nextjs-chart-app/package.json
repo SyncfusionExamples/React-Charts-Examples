@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@syncfusion/ej2-react-charts": "^33.2.10",
+    "@syncfusion/ej2-react-charts": "^33.2.15",
     "next": "16.2.7",
     "react": "19.2.4",
     "react-dom": "19.2.4"

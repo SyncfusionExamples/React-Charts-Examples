@@ -1,4 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
+
+import {
+  DataManager,
+  GraphQLAdaptor,
+  Query
+} from '@syncfusion/ej2-data';
+
 import {
   ChartComponent,
   SeriesCollectionDirective,
@@ -15,119 +22,116 @@ import {
 import './App.css';
 
 function App() {
-  const [chartData, setChartData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
+  const chartRef = useRef(null);
 
-  const graphqlUrl = 'http://localhost:5000/graphql';
-
-  useEffect(() => {
-    loadChartData();
+  const salesService = useMemo(() => {
+    return new DataManager({
+      url: 'http://localhost:5168/graphql',
+      adaptor: new GraphQLAdaptor({
+        response: {
+          result: 'salesChartData'
+        },
+        query: `
+          query {
+            salesChartData {
+              month
+              sales
+              expenses
+              profit
+            }
+          }
+        `
+      })
+    });
   }, []);
 
-  async function loadChartData() {
-    try {
-      setLoading(true);
-      setErrorMessage('');
+  useEffect(() => {
+    const loadChartData = async () => {
+      try {
+        const result = await salesService.executeQuery(
+          new Query()
+        );
 
-      const query = `
-        query {
-          salesChartData {
-            month
-            sales
-            expenses
-            profit
-          }
+        const chartData = result.result;
+
+        if (chartRef.current) {
+          chartRef.current.series[0].dataSource =
+            chartData;
+
+          chartRef.current.series[1].dataSource =
+            chartData;
+
+          chartRef.current.series[2].dataSource =
+            chartData;
+
+          chartRef.current.refresh();
         }
-      `;
-
-      const response = await fetch(graphqlUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: query
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`GraphQL request failed. Status: ${response.status}`);
+      } catch (error) {
+        console.error(error);
       }
+    };
 
-      const result = await response.json();
+    loadChartData();
+  }, [salesService]);
 
-      if (result.errors) {
-        throw new Error(result.errors[0].message);
+  const primaryXAxis = useMemo(
+    () => ({
+      valueType: 'Category',
+      title: 'Month',
+      majorGridLines: {
+        width: 0
       }
+    }),
+    []
+  );
 
-      setChartData(result.data.salesChartData);
-    } catch (error) {
-      setErrorMessage(error.message);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const primaryYAxis = useMemo(
+    () => ({
+      title: 'Amount in USD',
+      labelFormat: '${value}K',
+      lineStyle: {
+        width: 0
+      },
+      majorTickLines: {
+        width: 0
+      }
+    }),
+    []
+  );
 
-  const primaryXAxis = {
-    valueType: 'Category',
-    title: 'Month',
-    majorGridLines: {
-      width: 0
-    }
-  };
+  const tooltip = useMemo(
+    () => ({
+      enable: true
+    }),
+    []
+  );
 
-  const primaryYAxis = {
-    title: 'Amount in USD',
-    labelFormat: '${value}K',
-    lineStyle: {
-      width: 0
-    },
-    majorTickLines: {
-      width: 0
-    }
-  };
-
-  const tooltip = {
-    enable: true
-  };
-
-  const marker = {
-    dataLabel: {
-      visible: true
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="app-container">
-        <div className="chart-card status">Loading chart data...</div>
-      </div>
-    );
-  }
-
-  if (errorMessage) {
-    return (
-      <div className="app-container">
-        <div className="chart-card status error">
-          Error: {errorMessage}
-        </div>
-      </div>
-    );
-  }
+  const marker = useMemo(
+    () => ({
+      dataLabel: {
+        visible: true
+      }
+    }),
+    []
+  );
 
   return (
     <div className="app-container">
       <div className="header">
-        <h1>Syncfusion React Chart with HotChocolate GraphQL</h1>
+        <h1>
+          Syncfusion React Chart with
+          HotChocolate GraphQL
+        </h1>
         <p>
-          This chart loads sales data from an ASP.NET Core HotChocolate GraphQL backend.
+          This chart loads sales data from an
+          ASP.NET Core HotChocolate GraphQL backend.
         </p>
       </div>
 
       <div className="chart-card">
         <ChartComponent
           id="sales-chart"
+          ref={chartRef}
           title="Monthly Sales, Expenses, and Profit"
           primaryXAxis={primaryXAxis}
           primaryYAxis={primaryYAxis}
@@ -147,7 +151,7 @@ function App() {
 
           <SeriesCollectionDirective>
             <SeriesDirective
-              dataSource={chartData}
+              dataSource={[]}
               xName="month"
               yName="sales"
               name="Sales"
@@ -156,7 +160,7 @@ function App() {
             />
 
             <SeriesDirective
-              dataSource={chartData}
+              dataSource={[]}
               xName="month"
               yName="expenses"
               name="Expenses"
@@ -165,7 +169,7 @@ function App() {
             />
 
             <SeriesDirective
-              dataSource={chartData}
+              dataSource={[]}
               xName="month"
               yName="profit"
               name="Profit"

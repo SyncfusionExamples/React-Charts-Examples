@@ -1,225 +1,142 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef } from 'react';
+
 import {
-  AxisModel,
-  Category,
   ChartComponent,
-  ColumnSeries,
-  DataLabel,
-  Inject,
-  Legend,
-  LegendSettingsModel,
-  LineSeries,
-  MarkerSettingsModel,
   SeriesCollectionDirective,
   SeriesDirective,
+  Inject,
+  ColumnSeries,
+  LineSeries,
+  Category,
   Tooltip,
-  TooltipSettingsModel
-} from "@syncfusion/ej2-react-charts";
+  Legend,
+  DataLabel,
+  Chart
+} from '@syncfusion/ej2-react-charts';
 
-interface MonthlySales {
-  id: number;
-  month: string;
-  sales: number;
-  expenses: number;
-}
+import {
+  DataManager,
+  Query,
+  GraphQLAdaptor
+} from '@syncfusion/ej2-data';
 
-interface GraphQLError {
-  message: string;
-}
+const ChartGraphQL: React.FC = () => {
+  const chartRef = useRef<Chart | null>(null);
 
-interface MonthlySalesGraphQLResponse {
-  data?: {
-    getMonthlySales: {
-      count: number;
-      result: MonthlySales[];
-    };
+  const marker = {
+    visible: true,
+    width: 10,
+    height: 10,
+    dataLabel: {
+      visible: true,
+      position: 'Top'
+    }
   };
-  errors?: GraphQLError[];
-}
-
-const GRAPHQL_API_URL = "http://localhost:4000/graphql";
-
-function ChartGraphQL() {
-  const [chartData, setChartData] = useState<MonthlySales[]>([]);
-  const [recordCount, setRecordCount] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    loadChartData();
-  }, []);
+    const dataManager = new DataManager({
+      url: 'http://localhost:4000/graphql',
 
-  const loadChartData = async () => {
-    try {
-      setLoading(true);
-      setError("");
+      adaptor: new GraphQLAdaptor({
+        response: {
+          result: 'getMonthlySales.result',
+          count: 'getMonthlySales.count'
+        },
 
-      const query = `
-        query GetMonthlySales {
-          getMonthlySales {
-            count
-            result {
-              id
-              month
-              sales
-              expenses
+        query: `
+          query getMonthlySales($datamanager: DataManagerInput) {
+            getMonthlySales(datamanager: $datamanager) {
+              count
+              result {
+                id
+                month
+                sales
+                expenses
+              }
             }
           }
+        `
+      })
+    });
+
+    dataManager
+      .executeQuery(new Query())
+      .then((e: any) => {
+        console.log('Complete Response:', e);
+
+        // The DataManager wraps the GraphQL response in `e.result`,
+        // and the GraphQLAdaptor maps it to `{ result, count }`.
+        const chartData = e.result.result;
+
+        console.log('Chart Data:', chartData);
+
+        if (
+          chartRef.current &&
+          chartRef.current.series &&
+          chartRef.current.series.length > 0
+        ) {
+          chartRef.current.series[0].dataSource = chartData;
+          chartRef.current.series[1].dataSource = chartData;
+
+          chartRef.current.refresh();
         }
-      `;
-
-      const response = await fetch(GRAPHQL_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          query: query
-        })
+      })
+      .catch((error) => {
+        console.error('GraphQL Error:', error);
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error. Status: ${response.status}`);
-      }
-
-      const json: MonthlySalesGraphQLResponse = await response.json();
-
-      if (json.errors && json.errors.length > 0) {
-        throw new Error(json.errors[0].message);
-      }
-
-      const result = json.data?.getMonthlySales.result ?? [];
-      const count = json.data?.getMonthlySales.count ?? 0;
-
-      setChartData(result);
-      setRecordCount(count);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Unknown error occurred";
-
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const primaryXAxis: AxisModel = {
-    valueType: "Category",
-    title: "Month",
-    labelIntersectAction: "Rotate45"
-  };
-
-  const primaryYAxis: AxisModel = {
-    title: "Amount",
-    minimum: 0,
-    interval: 10,
-    labelFormat: "{value}"
-  };
-
-  const tooltip: TooltipSettingsModel = {
-    enable: true
-  };
-
-  const legendSettings: LegendSettingsModel = {
-    visible: true
-  };
-
-  const marker: MarkerSettingsModel = {
-    visible: true,
-    width: 8,
-    height: 8,
-    dataLabel: {
-      visible: true
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="status-card">
-        <h3>Loading chart data...</h3>
-        <p>Please wait. Data is being loaded from GraphQL backend.</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-card">
-        <h3>Unable to load chart data</h3>
-
-        <p>{error}</p>
-
-        <button className="retry-button" onClick={loadChartData}>
-          Retry
-        </button>
-
-        <div className="help-box">
-          <p>Check these points:</p>
-          <ul>
-            <li>Backend should be running on http://localhost:4000</li>
-            <li>GraphQL endpoint should be http://localhost:4000/graphql</li>
-            <li>Backend should have CORS enabled</li>
-          </ul>
-        </div>
-      </div>
-    );
-  }
+  }, []);
 
   return (
-    <div className="chart-card">
-      <div className="chart-header">
-        <div>
-          <h2>Monthly Sales and Expenses</h2>
-          <p>Total records loaded from GraphQL: {recordCount}</p>
-        </div>
+    <ChartComponent
+      id="graphql-chart"
+      title="Monthly Sales and Expenses"
+      ref={chartRef as any}
+      primaryXAxis={{
+        valueType: 'Category',
+        title: 'Month'
+      }}
+      primaryYAxis={{
+        title: 'Amount'
+      }}
+      tooltip={{
+        enable: true
+      }}
+      legendSettings={{
+        visible: true
+      }}
+    >
+      <Inject
+        services={[
+          ColumnSeries,
+          LineSeries,
+          Category,
+          Legend,
+          Tooltip,
+          DataLabel
+        ]}
+      />
 
-        <button className="refresh-button" onClick={loadChartData}>
-          Refresh Data
-        </button>
-      </div>
-
-      <ChartComponent
-        id="monthly-sales-chart"
-        title="Sales vs Expenses Report"
-        primaryXAxis={primaryXAxis}
-        primaryYAxis={primaryYAxis}
-        tooltip={tooltip}
-        legendSettings={legendSettings}
-        height="450px"
-      >
-        <Inject
-          services={[
-            ColumnSeries,
-            LineSeries,
-            Category,
-            Legend,
-            Tooltip,
-            DataLabel
-          ]}
+      <SeriesCollectionDirective>
+        <SeriesDirective
+          dataSource={[]}
+          xName="month"
+          yName="sales"
+          type="Column"
+          name="Sales"
+          marker={marker}
         />
 
-        <SeriesCollectionDirective>
-          <SeriesDirective
-            dataSource={chartData}
-            xName="month"
-            yName="sales"
-            name="Sales"
-            type="Column"
-            marker={marker}
-          />
-
-          <SeriesDirective
-            dataSource={chartData}
-            xName="month"
-            yName="expenses"
-            name="Expenses"
-            type="Line"
-            marker={marker}
-          />
-        </SeriesCollectionDirective>
-      </ChartComponent>
-    </div>
+        <SeriesDirective
+          dataSource={[]}
+          xName="month"
+          yName="expenses"
+          type="Line"
+          name="Expenses"
+          marker={marker}
+        />
+      </SeriesCollectionDirective>
+    </ChartComponent>
   );
-}
+};
 
 export default ChartGraphQL;
