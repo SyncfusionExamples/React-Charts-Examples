@@ -1,0 +1,6 @@
+@ChartMySQL.Server_HostAddress = http://localhost:5073
+
+GET {{ChartMySQL.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
